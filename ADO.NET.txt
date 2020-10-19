@@ -1,0 +1,85 @@
+ADO.NET
+
+
+ADO.NET :
+	.NET에서 데이터베이스 프로그래밍을 하기 위한 도구
+	 => 동일한 형태의 데이터베이스 접근 방법 제공
+	DAO -> ADO -> ADO.NET (발전 과정)
+ADO.NET은 크게 두가지 1. 연결지향방법   2. 비연결지향
+기존의 DAO와 ADO는 모두 연결지향 방법이였음
+1. 연결지향방법 : 기존의 방법, 연결된 상태에서 한줄 한줄 가지고 오는 방법
+	          연결이 되어있어야 데이터를 가져올수있음 도중에 끊키면 안됨
+2. 비연결지향 : 중간에 연결을 끊고 다른 곳에 저장시킴 그래서 연결을 끊어도 됨
+	        저장한것을 가지고 지지고 볶고 하는것, 연결시간을 최소로함
+연결지향= 클라언트가 퀴리문을 디비에 준대
+디비연결하고 커멘드문을 날려
+그 실행된 결과가 나오고 그거를 루프돌면서 화면에찎어 다찎으면 그때 연결을 클로즈
+=동접많으면 부담
+
+비연결지향= 클라이언트가 먼저 디비에 연결하고(커넥션))
+그리고나서 쿼리문 실행하고 그결과를
+데이터셋에 담아놓고
+그떄 바로 클로오즈 할수있어요
+그래고나서 데이터셋만 바라 보면서 코딩해요 
+데이터셋은 새로나온거예용
+
+데이터셋 : ADO.NET의 핵심 객체, 비연결지향으로 인해 과정을 다 저장하기때문에 크기가 큼
+	 in memory datebase => 데이터셋을 한마디로 정의한 것
+	 데이터셋은 전용이 없다. 결과를 받아와서 담는 것이니 DBMS가 상관없음
+	 다른 네임스페이스에 있다는 뜻. 디폴트는 셀렉트 커맨드
+
+닷넷 데이터 프로바이더
+	OleDB : 어떤 DBMS던 내부적으로 DBMS종류에 따라 분기 처리를 해줌
+		단 중간단계가 들어가서 느리다
+	전용 Date Provider : 전용 프로바이더가 속도가 좀더 빠르다 각 회사마다 전용으로 
+			  만들어진다
+			  오라클 : odp닷넷 / MySQL 닷넷 데이터 프로바이더
+			  MS는 처음부터 BCL에 담겨있어 전용은 따로없다
+
+mysql connector : https://www.mysql.com/products/connector/ 
+		드라이버를 종류별로 다운로드 가능 ( 데이터 전용 프로바이더)
+
+보안을 위해 SQL파라미터를 사용하는게 좋다
+
+COMMAND
+ExecuteReader( ) : 셀렉트문을 할때 
+ExecuteNonQuery( ) : (업데이트, 인서트, 딜리트) 처럼 뭐가 적용됐는지 보여주는것 셀렉트문을 
+		   쓸때 쓰면 아무런 결과값을 가져오지 않는다 (인트로 준다)
+ExecuteScala( ) : 스칼라는 값이라는뜻 값 1개만 가져올때 쓴다 (오브젝트 타입으로 준다)
+
+
+- DB연결과정 
+
+1. 참조추가 : DLL이 자동으로 참조 돼있지 않다
+	     참조추가 -> 확장 -> MySQL.Data 추가 
+	     
+2. Using 네임스페이스 : MySql.Data.MySqlClient.MySqlConnection;
+			=>MySql.Data.MySqlClient 네임스페이스 추가해주기
+
+https://www.connectionstrings.com/mysql/ : 커넥션 참고 사이트
+
+비연결방식에서 FILL에서 오류가 나면 쿼리문에서 난것
+DB를 여러번 연결해야할때 좋은 방법 : App.config활용
+	<configuration>밑에
+		<connectionStrings>
+    			<add name="myDB" connectionString="Server=127.0.0.1,3306;Uid=root;pwd=1234;Database = employees" />
+  			</connectionStrings>
+	이렇게 DB커넥션스트링 줄수있음
+그다음 참조추가 -> 프레임워크 System.Configuration추가 한후
+string strConn = ConfigurationManager.ConnectionStrings["myDB"].ConnectionString;
+이렇게 문자열로 반환받아 사용한다
+스타트업 사이는 건들이면 안되고
+
+실제 프로그래밍에서는 코딩을 다르게 해주지는 않음
+
+컨피그는 컴파일을 다시 하지 않아도 되서 그때 그때 동적으로 값이 바뀌었으면 할때 컨피그 활용
+커넥션스트링스 : 연결 디비가 여러개일때
+앱세팅스 : 값을 동적으로 할당할 때
+
+DB연결
+1.MySQL.Data.dll
+  System.Configuration.dll
+2.app.config
+  <connectionstrings>
+3.using MySql.Data.MySqlClient;
+  using System.Configuration; ==>네임스페이스하기전에 참조추가
